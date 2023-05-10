@@ -19,7 +19,7 @@ images_path = "images_database_passport_size/"
 detected_images_path = "detected/"
 grp_images_path = "group_images/"
 
-models = ["ArcFace", "Facenet512","SFace",'Facenet']
+models = ["ArcFace"]
 backends = ['dlib', 'retinaface', 'opencv', 'ssd', 'mtcnn']
 
 all_combis = output = [[a, b] for a in models
@@ -110,14 +110,21 @@ def updateFirebaseDB(subject_name):
         'databaseURL': 'https://beprojecttrial-default-rtdb.firebaseio.com/'
     })
 
-    ref = db.reference("Students/CE/BE/B",  app=firebase_admin.get_app(name='MERI MARZI'))
+    ref = db.reference("Students/CE/BE/B", app=firebase_admin.get_app(name='MERI MARZI'))
+    fileNames = [f for f in os.listdir("images_database_passport_size") if
+                 os.path.isfile(os.path.join("images_database_passport_size", f))]
 
+    foundNames = []
+    for n in result:
+        foundNames.append(n[0])
+    current_date = str(datetime.date.today())
     for name in result:
         name = name[0]
+
         Sid = str(name).split('_', 1)[0]
+        Sname = str(name).split('.', 1)[0]
         if Sid in ref.get():
-            current_date = str(datetime.date.today())
-            path = "Attendance/CE/BE/B" + "/" + Sid + "/" + current_date
+            path = "Attendance/CE/BE/B" + "/" + Sname + "/" + current_date
             ref_init = db.reference(path, app=firebase_admin.get_app(name='MERI MARZI'))
             list_ref = ref_init.get()
             if list_ref is not None:
@@ -126,8 +133,27 @@ def updateFirebaseDB(subject_name):
             else:
                 ref_init.set([subject_name])
 
+    for name in fileNames:
+
+        if name not in foundNames:
+
+
+
+            Sid = str(name).split('_', 1)[0]
+            Sname = str(name).split('.', 1)[0]
+            if Sid in ref.get():
+                path = "Attendance/CE/BE/B" + "/" + Sname + "/" + current_date
+                ref_init = db.reference(path, app=firebase_admin.get_app(name='MERI MARZI'))
+                list_ref = ref_init.get()
+                if list_ref is not None:
+                    list_ref.append("NA")
+                    ref_init.set(list_ref)
+                else:
+                    ref_init.set(["NA"])
+
 
 def download_images():
+    
     cred = credentials.Certificate('beprojecttrial-firebase-adminsdk-pgvuf-96845622a4.json')
     firebase_admin.initialize_app(cred, {
         'storageBucket': 'beprojecttrial.appspot.com'
@@ -167,7 +193,7 @@ def download_images():
 
 def main():
     start = time.time()
-    download_images()
+    # download_images()
     recognize_faces()
 
     if len(result) != 0:
