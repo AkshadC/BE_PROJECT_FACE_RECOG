@@ -105,6 +105,9 @@ def calculate_enhanced_faces(img_path):
 
 
 def updateFirebaseDB(subject_name):
+    resultt = [("S1_AkshadC", 2), ("S2_GayatriM", 2), ("S3_VidyaJain", 2), ("S4_SagarM", 2), ("S5_MousamSingh", 2),
+               ("S6_TejalP", 2), ("S7_SankalpW", 2), ("S8_MonikaN", 2), ("S9_ShreyasJ", 2), ("S10_LaluNair", 2)]
+
     cred = credentials.Certificate('beprojecttrial-firebase-adminsdk-pgvuf-96845622a4.json')
     firebase_admin.initialize_app(cred, name="MERI MARZI", options={
         'databaseURL': 'https://beprojecttrial-default-rtdb.firebaseio.com/'
@@ -113,14 +116,14 @@ def updateFirebaseDB(subject_name):
     ref = db.reference("Students/CE/BE/B", app=firebase_admin.get_app(name='MERI MARZI'))
     fileNames = [f for f in os.listdir("images_database_passport_size") if
                  os.path.isfile(os.path.join("images_database_passport_size", f))]
-
+    filenames = ["S1_AkshadC", "S2_GayatriM", "S3_VidyaJain", "S4_SagarM", "S5_MousamSingh", "S6_TejalP",
+                  "S7_SankalpW", "S8_MonikaN", "S9_ShreyasJ", "S10_LaluNair"]
     foundNames = []
-    for n in result:
+    for n in resultt:
         foundNames.append(n[0])
-    current_date = str(datetime.date.today())
-    for name in result:
+    current_date = str("2023-05-12")
+    for name in resultt:
         name = name[0]
-
         Sid = str(name).split('_', 1)[0]
         Sname = str(name).split('.', 1)[0]
         if Sid in ref.get():
@@ -133,12 +136,9 @@ def updateFirebaseDB(subject_name):
             else:
                 ref_init.set([subject_name])
 
-    for name in fileNames:
-
+    for name in filenames:
+        # name = name.split('.')[0]
         if name not in foundNames:
-
-
-
             Sid = str(name).split('_', 1)[0]
             Sname = str(name).split('.', 1)[0]
             if Sid in ref.get():
@@ -153,7 +153,6 @@ def updateFirebaseDB(subject_name):
 
 
 def download_images():
-    
     cred = credentials.Certificate('beprojecttrial-firebase-adminsdk-pgvuf-96845622a4.json')
     firebase_admin.initialize_app(cred, {
         'storageBucket': 'beprojecttrial.appspot.com'
@@ -194,10 +193,10 @@ def download_images():
 def main():
     start = time.time()
     # download_images()
-    recognize_faces()
-
+    # recognize_faces()
+    updateFirebaseDB("EL5")
     if len(result) != 0:
-        updateFirebaseDB("HPC")
+
         print(result)
     else:
         print("No Students Found")
